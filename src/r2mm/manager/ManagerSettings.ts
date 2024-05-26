@@ -116,6 +116,11 @@ export default class ManagerSettings {
         ManagerSettings.CONTEXT.gameSpecific.launchParameters = launchParams;
         await this.save();
     }
+    
+    public async setRunRawMode(isRunning: boolean) {
+        ManagerSettings.CONTEXT.gameSpecific.runRaw = isRunning;
+        await this.save();
+    }
 
     public async setIgnoreCache(ignore: boolean) {
         ManagerSettings.CONTEXT.global.ignoreCache = ignore;
