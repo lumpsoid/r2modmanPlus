@@ -7,6 +7,9 @@
 | [Features](#features) | [What is a mod manager?](#what-is-a-mod-manager) | [Installing](#installing) | [Help](#help) | [Feedback and suggestions](#feedback-and-suggestions) | [Changelog](#changelog) | [Screenshots](#screenshots) |
 |---|---|---|---|---|---|---|
 
+## Difference with official project
+- supports starting a game via EXE file
+
 ## Features
 - Support for Risk of Rain 2, Dyson Sphere Program, Valheim, GTFO, BONEWORKS, and more
 - A clean user interface designed to make modding as simple as possible
