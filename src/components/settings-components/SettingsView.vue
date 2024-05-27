@@ -105,12 +105,12 @@ export default class SettingsView extends mixins(UtilityMixin) {
         new SettingsRow(
             'Locations',
             'Run raw exe game file',
-            `Will run game EXE file from the game directory: ${this.settings.getContext().gameSpecific.gameDirectory}.`,
+            `Choose which way to run the game.`,
             async () =>
             {
                 return this.settings.getContext().gameSpecific.runRaw
-                    ? `Will run game EXE from the game folder.`
-                    : `Will run through platform: ${this.activeGame.activePlatform.storePlatform}`;
+                    ? `Run game EXE file from the game directory: ${this.settings.getContext().gameSpecific.gameDirectory}`
+                    : `Run through platform: ${this.activeGame.activePlatform.storePlatform}`;
             },
             'fa-wrench',
             () =>
