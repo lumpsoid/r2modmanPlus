@@ -7,6 +7,9 @@
 | [Features](#features) | [What is a mod manager?](#what-is-a-mod-manager) | [Installing](#installing) | [Help](#help) | [Feedback and suggestions](#feedback-and-suggestions) | [Changelog](#changelog) | [Screenshots](#screenshots) |
 |---|---|---|---|---|---|---|
 
+## Difference with official project
+- supports starting a game via EXE file
+
 ## Features
 - Support for Risk of Rain 2, Dyson Sphere Program, Valheim, GTFO, BONEWORKS, and more
 - A clean user interface designed to make modding as simple as possible
@@ -92,4 +95,36 @@ Config editor
 Profiles
 
 ![](https://i.imgur.com/nLfNaQJ.png)
+
+# Development
+## Creating dev environment 
+### Windows
+#### Using choco
+
+2. WIN+R
+3. `powershell`
+1. `choco install -y git, nvm, yarn`
+4. reopen terminal using steps 1 and 2
+5. `cd <path to the folder where you want to clone the repository>`
+6. `git clone https://github.com/lumpsoid/r2modmanPlus`
+7. `cd r2modmanPlus`
+8. `nvm install 16`
+9. `nvm use 16`
+10. `yarn global add @quasar/cli`
+11. `nvm install 14`
+12. `nvm use 14`
+13. `yarn install --ignore-engines`
+
+For another ways and other tips look into [DevEnvSetup](./DevEnvSetup.md).
+
+As I understand original project didn't maintain [BUILDING](./BUILDING.md) file.
+
+## Runing
+For live run the project use: `quasar dev -m electron`
+
+You will need `nvm use 16` at minimum.
+
+## Building
+For building use: `yarn build-win` (or check [package.json](./package.json) file)
+
 
