@@ -11,13 +11,15 @@ import { GameSelectionViewMode } from '../../model/enums/GameSelectionViewMode';
 
 export const SETTINGS_DB_NAME = "settings";
 
-export default class SettingsDexieStore extends Dexie {
+export default class SettingsDexieStore extends Dexie
+{
 
     global: Dexie.Table<SettingsInterface, number>;
     gameSpecific: Dexie.Table<SettingsInterface, number>;
     activeGame: Game;
 
-    constructor(game: Game) {
+    constructor(game: Game)
+    {
         super(SETTINGS_DB_NAME);
         this.version(1).stores({
             value: `++id,settings`,
@@ -28,7 +30,8 @@ export default class SettingsDexieStore extends Dexie {
         } as any;
 
         GameManager.gameList
-            .forEach(value => {
+            .forEach(value =>
+            {
                 store[value.settingsIdentifier] = `++id,settings`;
             });
 
@@ -41,22 +44,28 @@ export default class SettingsDexieStore extends Dexie {
         this.gameSpecific = this.table(game.settingsIdentifier);
     }
 
-    public async getLatestGlobal(): Promise<ManagerSettingsInterfaceGlobal_V2> {
-        return this.global.toArray().then(async result => {
-            if (result.length > 0) {
+    public async getLatestGlobal(): Promise<ManagerSettingsInterfaceGlobal_V2>
+    {
+        return this.global.toArray().then(async result =>
+        {
+            if (result.length > 0)
+            {
                 const globalEntry = result[result.length - 1];
                 const parsed = JSON.parse(globalEntry.settings);
-                if ((parsed as ManagerSettingsInterfaceGlobal_V2).version) {
+                if ((parsed as ManagerSettingsInterfaceGlobal_V2).version)
+                {
                     // Is modern (at least V2).
                     return parsed;
-                } else {
+                } else
+                {
                     // Is legacy.
                     const legacyToV2 = this.mapLegacyToV2(parsed, this.activeGame);
                     await this.global.put({ settings: JSON.stringify(legacyToV2.global) });
                     await this.gameSpecific.put({ settings: JSON.stringify(legacyToV2.gameSpecific) });
                     return legacyToV2.global;
                 }
-            } else {
+            } else
+            {
                 ManagerSettings.NEEDS_MIGRATION = true;
                 const obj = this.createNewSettingsInstance();
                 await this.global.put({ settings: JSON.stringify(obj.global) });
@@ -66,19 +75,27 @@ export default class SettingsDexieStore extends Dexie {
         });
     }
 
-    public async getLatestGameSpecific(): Promise<ManagerSettingsInterfaceGame_V2> {
-        return this.gameSpecific.toArray().then(async result => {
-            if (result.length > 0) {
+    public async getLatestGameSpecific(): Promise<ManagerSettingsInterfaceGame_V2>
+    {
+        return this.gameSpecific.toArray().then(async result =>
+        {
+            if (result.length > 0)
+            {
                 const globalEntry = result[result.length - 1];
                 const parsed = JSON.parse(globalEntry.settings);
-                if ((parsed as ManagerSettingsInterfaceGame_V2).version === 2) {
+                if ((parsed as ManagerSettingsInterfaceGame_V2).version === 2)
+                {
                     // Is modern (at least V2).
+                    console.log("Game specific settings are modern.");
+                    console.log(parsed);
                     return parsed;
-                } else {
+                } else
+                {
                     // Placeholder for future migration
                     return;
                 }
-            } else {
+            } else
+            {
                 const obj = this.createNewSettingsInstance();
                 await this.gameSpecific.put({ settings: JSON.stringify(obj.gameSpecific) });
                 return obj.gameSpecific;
@@ -86,8 +103,10 @@ export default class SettingsDexieStore extends Dexie {
         });
     }
 
-    public async getLatest(): Promise<ManagerSettingsInterfaceHolder> {
-        const get = async () => {
+    public async getLatest(): Promise<ManagerSettingsInterfaceHolder>
+    {
+        const get = async () =>
+        {
             const latestGlobal = await this.getLatestGlobal();
             const latestGameSpecific = await this.getLatestGameSpecific();
             return {
@@ -99,7 +118,8 @@ export default class SettingsDexieStore extends Dexie {
         return await this.transaction("rw!", this.global, this.gameSpecific, get);
     }
 
-    private createNewSettingsInstance(): ManagerSettingsInterfaceHolder {
+    private createNewSettingsInstance(): ManagerSettingsInterfaceHolder
+    {
         return {
             global: {
                 darkTheme: true,
@@ -118,6 +138,7 @@ export default class SettingsDexieStore extends Dexie {
             gameSpecific: {
                 version: 2,
                 gameDirectory: null,
+                runRaw: false,
                 installedDisablePosition: EnumResolver.from(SortLocalDisabledMods, SortLocalDisabledMods.CUSTOM)!,
                 installedSortBy: EnumResolver.from(SortNaming, SortNaming.CUSTOM)!,
                 installedSortDirection: EnumResolver.from(SortDirection, SortDirection.STANDARD)!,
@@ -128,16 +149,22 @@ export default class SettingsDexieStore extends Dexie {
         }
     }
 
-    public async save(holder: ManagerSettingsInterfaceHolder) {
-        const update = async () => {
-            await this.global.toArray().then(async result => {
-                for (let settingsInterface of result) {
-                    await this.global.update(settingsInterface.id!, {settings: JSON.stringify(holder.global)});
+    public async save(holder: ManagerSettingsInterfaceHolder)
+    {
+        const update = async () =>
+        {
+            await this.global.toArray().then(async result =>
+            {
+                for (let settingsInterface of result)
+                {
+                    await this.global.update(settingsInterface.id!, { settings: JSON.stringify(holder.global) });
                 }
             });
-            await this.gameSpecific.toArray().then(async result => {
-                for (let settingsInterface of result) {
-                    await this.gameSpecific.update(settingsInterface.id!, {settings: JSON.stringify(holder.gameSpecific)});
+            await this.gameSpecific.toArray().then(async result =>
+            {
+                for (let settingsInterface of result)
+                {
+                    await this.gameSpecific.update(settingsInterface.id!, { settings: JSON.stringify(holder.gameSpecific) });
                 }
             });
         }
@@ -145,7 +172,8 @@ export default class SettingsDexieStore extends Dexie {
         await this.transaction("rw!", this.global, this.gameSpecific, update);
     }
 
-    private mapLegacyToV2(itf: ManagerSettingsInterface_Legacy, game: Game): ManagerSettingsInterfaceHolder {
+    private mapLegacyToV2(itf: ManagerSettingsInterface_Legacy, game: Game): ManagerSettingsInterfaceHolder
+    {
         return {
             global: {
                 darkTheme: itf.darkTheme,
@@ -163,6 +191,7 @@ export default class SettingsDexieStore extends Dexie {
             },
             gameSpecific: {
                 version: 2,
+                runRaw: false,
                 gameDirectory: game.displayName === "Risk of Rain 2" ? itf.riskOfRain2Directory : null,
                 installedDisablePosition: itf.installedDisablePosition,
                 installedSortBy: itf.installedDisablePosition,
@@ -176,7 +205,8 @@ export default class SettingsDexieStore extends Dexie {
 
 }
 
-interface SettingsInterface {
+interface SettingsInterface
+{
     id?: number;
     settings: string;
 }
@@ -185,7 +215,8 @@ interface SettingsInterface {
  * Legacy interface as manager was designed to originally only support Risk of Rain 2.
  * Expanding supported games means that the "riskOfRain2Directory" setting should no longer be global.
  */
-export interface ManagerSettingsInterface_Legacy {
+export interface ManagerSettingsInterface_Legacy
+{
     riskOfRain2Directory: string | null;
     steamDirectory: string | null;
     lastSelectedProfile: string;
@@ -204,7 +235,8 @@ export interface ManagerSettingsInterface_Legacy {
 /**
  * These settings should persist regardless of the game selected.
  */
-export interface ManagerSettingsInterfaceGlobal_V2 {
+export interface ManagerSettingsInterfaceGlobal_V2
+{
     version: number;
     steamDirectory: string | null;
     funkyModeEnabled: boolean;
@@ -222,8 +254,10 @@ export interface ManagerSettingsInterfaceGlobal_V2 {
 /**
  * These settings should only be applied on a per-game basis.
  */
-export interface ManagerSettingsInterfaceGame_V2 {
+export interface ManagerSettingsInterfaceGame_V2
+{
     version: number;
+    runRaw: boolean;
     gameDirectory: string | null;
     lastSelectedProfile: string;
     linkedFiles: string[];
@@ -236,7 +270,8 @@ export interface ManagerSettingsInterfaceGame_V2 {
 /**
  * Helper interface to neatly store settings internally.
  */
-export interface ManagerSettingsInterfaceHolder {
+export interface ManagerSettingsInterfaceHolder
+{
     global: ManagerSettingsInterfaceGlobal_V2;
     gameSpecific: ManagerSettingsInterfaceGame_V2;
 }
