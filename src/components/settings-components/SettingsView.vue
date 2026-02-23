@@ -53,6 +53,22 @@ let settingsList = [
     ),
     new SettingsRow(
         'Locations',
+        'Run raw exe game file',
+        `Will run game EXE file from the game directory: ${settings.value.getContext().gameSpecific.gameDirectory}.`,
+        async () => {
+            return settings.value.getContext().gameSpecific.runRaw
+                ? `Will run game EXE from the game folder.`
+                : `Will run through platform: ${activeGame.value.activePlatform.storePlatform}`;
+        },
+        'fa-wrench',
+        () => {
+            settings.value.setRunRawMode(
+                !settings.value.getContext().gameSpecific.runRaw
+            );
+        },
+    ),
+    new SettingsRow(
+        'Locations',
         `Change ${activeGame.value.displayName} folder`,
         `Change the location of the ${activeGame.value.displayName} folder that ${appName.value} uses.`,
         async () => {

@@ -170,10 +170,23 @@ const importingLocalMod = ref<boolean>(false);
 const doorstopTarget = ref<string>("");
 const vanillaLaunchArgs = ref<string>("");
 
+const isRunningRawMode = ref<boolean>(false);
+const showRunRawModal = ref<boolean>(false);
+
 const activeGame = computed(() => store.state.activeGame);
 const settings = computed(() => store.getters['settings']);
 const profile = computed(() => store.getters['profile/activeProfile']);
 const localModList = computed(() => store.state.profile.modList);
+
+function showChangeAppid() {
+    isRunningRawMode.value = settings.value.getContext().gameSpecific.runRaw;
+    showRunRawModal.value = true;
+}
+
+function updateRunRawMode() {
+    this.settings.setRunRawMode(isRunningRawMode.value);
+    showRunRawModal.value = false;
+}
 
 function canRenderLaunchTypeModal() {
     return ['linux', 'darwin'].includes(appWindow.getPlatform());
@@ -502,6 +515,9 @@ async function handleSettingsCallbacks(invokedSetting: any) {
             break;
         case "CleanCache":
             CacheUtil.clean();
+            break;
+        case "SetAppId":
+            showChangeAppid();
             break;
     }
 }

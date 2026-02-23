@@ -135,6 +135,7 @@ export default class SettingsDexieStore extends Dexie {
                 linkedFiles: [],
                 launchType: LaunchType.AUTO,
                 lastSelectedPlatform: null,
+                runRaw: false,
             }
         }
     }
@@ -228,6 +229,7 @@ export interface ManagerSettingsInterfaceGame_V2 {
     installedDisablePosition: string;
     launchType: string;
     lastSelectedPlatform: string | null;
+    runRaw: boolean;
 }
 
 /**

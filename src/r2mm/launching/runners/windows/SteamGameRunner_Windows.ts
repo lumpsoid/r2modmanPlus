@@ -37,12 +37,26 @@ export default class SteamGameRunner_Windows extends GameRunnerProvider {
                 return resolve(steamDir);
             }
 
+            const appId = game.activePlatform.storeIdentifier;
+            const exeString = settings.getContext().gameSpecific.runRaw
+                ? `"${settings.getContext().gameSpecific.gameDirectory}/${game.exeName}" ${args} ${settings.getContext().gameSpecific.launchParameters}`
+                : `"${steamDir}/Steam.exe" -applaunch ${appId} ${args} ${settings.getContext().gameSpecific.launchParameters}`;
+
+            if (settings.getContext().gameSpecific.runRaw && settings.getContext().gameSpecific.gameDirectory === null) {
+                const errorString = 'Game directory is not set when trying to run game through it.';
+                LoggerProvider.instance.Log(LogSeverity.ACTION_STOPPED, 'Error was thrown whilst starting game.');
+                LoggerProvider.instance.Log(LogSeverity.ERROR, errorString);
+                const r2err = new R2Error('Error starting Steam', errorString, 'Ensure that the game directory has been set correctly in the settings');
+                return reject(r2err);
+            }
+
+
             const mappedArgs = args.map(value => `"${value}"`).join(' ');
 
             LoggerProvider.instance.Log(LogSeverity.INFO, `Steam folder is: ${steamDir}`);
             LoggerProvider.instance.Log(LogSeverity.INFO, `Running command: ${steamDir}.exe -applaunch ${game.activePlatform.storeIdentifier} ${mappedArgs} ${settings.getContext().gameSpecific.launchParameters}`);
 
-            ChildProcess.exec(`"${steamDir}/Steam.exe" -applaunch ${game.activePlatform.storeIdentifier} ${mappedArgs} ${settings.getContext().gameSpecific.launchParameters}`, undefined, (err => {
+            ChildProcess.exec(exeString, undefined, (err => {
                 if (err !== null) {
                     LoggerProvider.instance.Log(LogSeverity.ACTION_STOPPED, 'Error was thrown whilst starting modded');
                     LoggerProvider.instance.Log(LogSeverity.ERROR, err.message);
